@@ -183,7 +183,7 @@ Three controlled scenarios are evaluated:
 
 ---
 
-### 📈 Final Results
+### Final Results
 
 | Scenario | AUC    |
 | -------- |--------|
@@ -207,7 +207,7 @@ Three controlled scenarios are evaluated:
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 * Python 3
 * NumPy / Pandas
