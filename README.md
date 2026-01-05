@@ -1,3 +1,5 @@
+<img width="1200" height="627" alt="Linkedin Preview" src="https://github.com/user-attachments/assets/ae05d781-1384-4b8e-811f-2f53c4e5b111" />
+
 # Credit Risk Feature Engine (Numba‑Powered)
 
 > **High‑performance temporal feature engineering for credit risk modeling**
