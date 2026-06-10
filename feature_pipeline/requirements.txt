@@ -1,0 +1,6 @@
+numpy
+pandas
+numba
+pytest
+psycopg2-binary
+redis
