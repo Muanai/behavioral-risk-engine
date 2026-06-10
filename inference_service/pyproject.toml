@@ -1,0 +1,13 @@
+[project]
+name = "inference-service"
+version = "0.1.0"
+description = "Low-latency FastAPI model serving interface"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "httpx>=0.24.0",
+    "lightgbm>=3.3.0",
+    "numpy>=1.22.0",
+    "pandas>=1.4.0",
+]

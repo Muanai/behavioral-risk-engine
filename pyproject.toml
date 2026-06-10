@@ -1,0 +1,13 @@
+[project]
+name = "behavioral-risk-engine"
+version = "0.1.0"
+description = "End-to-end behavioral credit risk platform with Numba and FastAPI"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "feature_pipeline",
+    "model_training",
+    "inference_service"
+]

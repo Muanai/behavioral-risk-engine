@@ -1,0 +1,17 @@
+[project]
+name = "feature-pipeline"
+version = "0.1.0"
+description = "Numba-accelerated feature engineering engine and sync pipelines"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.22.0",
+    "pandas>=1.4.0",
+    "numba>=0.56.0",
+    "psycopg2-binary>=2.9.0",
+    "redis>=5.0.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+]
