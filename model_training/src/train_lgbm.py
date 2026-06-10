@@ -36,5 +36,6 @@ def train_lightgbm(df, target_col):
     return {
         "model": model,
         "auc": auc,
-        "importance": importance_df
+        "importance": importance_df,
+        "X_test": X_test
     }

@@ -1,4 +1,26 @@
 __pycache__/
 *.pyc
 .venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Testing
+.pytest_cache/
+
+# Data
+data/processed/*.csv
+data/processed/*.parquet
+data/raw/*.csv
+*.csv
+
+# Model Artifacts
+*.pkl
+*.model
+model_training/artifacts/*
+
+# OS generated files
 .DS_Store
+Thumbs.db

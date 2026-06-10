@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from src.features_numba import get_max_consecutive_late, get_velocity_slope
+from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
 
 
 def test_late_streak_logic():

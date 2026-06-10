@@ -7,3 +7,5 @@ seaborn
 jupyter
 lightgbm
 pytest
+pathlib
+xlrd>=2.0.1

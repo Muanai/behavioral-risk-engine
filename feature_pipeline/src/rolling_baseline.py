@@ -1,3 +1,4 @@
+# Baseline implementation for correctness and testing
 def rolling_mean_python(values, user_ids, window):
     n = len(values)
     out = [0.0] * n

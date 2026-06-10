@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+# Pandas reference implementation (readable, slower)
 def rolling_features(df, window):
     return (
         df

@@ -1,8 +1,8 @@
 import time
 import pandas as pd
-from src.features_numba import rolling_mean_numba
-from src.features_pandas import rolling_features
-from src.features_baseline import rolling_mean_python
+from feature_pipeline.src.features_numba import rolling_mean_numba
+from feature_pipeline.src.features_pandas import rolling_features
+from feature_pipeline.src.rolling_baseline import rolling_mean_python
 
 df = pd.read_csv("data/processed/transactions_processed.csv")
 

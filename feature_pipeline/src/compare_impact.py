@@ -1,5 +1,8 @@
 import pandas as pd
-from src.models.train_lgbm import train_lightgbm
+from model_training.src.train_lgbm import train_lightgbm
+import shap
+import numpy as np
+import matplotlib.pyplot as plt
 
 RAW_PATH = "data/processed/transactions_processed.csv"
 ENGINEERED_PATH = "data/processed/transactions_engineered.csv"
@@ -63,6 +66,46 @@ def main():
     uplift = res_hybrid['auc'] - res_base['auc']
     print(f"\nFinal Uplift (Hybrid vs Baseline): {uplift:+.4f} ({uplift / res_base['auc']:.1%} improvement)")
 
+    print("\n[Visual] Generating SHAP Feature Importance Plot...")
+
+    best_model = res_hybrid['model']
+    X_test_hybrid = res_hybrid['X_test']
+
+    explainer = shap.TreeExplainer(best_model)
+    X_display = X_test_hybrid.iloc[:5000]
+    shap_values = explainer.shap_values(X_display)
+
+    if isinstance(shap_values, list):
+        shap_values_target = shap_values[1]
+    else:
+        shap_values_target = shap_values
+
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(figsize=(10, 8), dpi=150)
+
+    bg_color = '#1A202C'
+    teal_accent = '#4FD1C5'
+
+    fig.patch.set_facecolor(bg_color)
+    ax.set_facecolor(bg_color)
+
+    from shap.plots import colors
+    colors.blue_rgb = np.array([79 / 255, 209 / 255, 197 / 255])
+
+    shap.summary_plot(shap_values_target, X_display, plot_type="bar",
+                      max_display=12, show=False, color=teal_accent)
+
+    ax.set_title('Hybrid Model: Feature Importance', fontsize=16, fontweight='bold', color='#F7FAFC', pad=20)
+    ax.tick_params(axis='x', colors='#A0AEC0')
+    ax.tick_params(axis='y', colors='#F7FAFC', labelsize=12)
+
+    plt.tight_layout()
+    output_filename = 'proof_shap_hybrid.svg'
+    plt.savefig(output_filename, dpi=300, facecolor=bg_color)
+    print(f"   >>> PROOF SAVED: {output_filename}")
+
+    plt.savefig(output_filename, format='svg', transparent=True)
+    # plt.show()
 
 if __name__ == "__main__":
     main()

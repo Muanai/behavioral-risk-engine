@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import time
 import os
-from src.features_numba import get_max_consecutive_late, get_velocity_slope
+from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
 
 
 DATA_PATH = os.path.join("data", "processed", "transactions_processed.csv")

@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from src.models.train_lr import train_logistic_regression
-from src.models.train_lgbm import train_lightgbm
-from src.monitoring import check_model_stability
+from model_training.src.train_lr import train_logistic_regression
+from model_training.src.train_lgbm import train_lightgbm
+from feature_pipeline.src.monitoring import check_model_stability
 
 
 def run_model_evaluation(feature_path, raw_data_path, target_col):

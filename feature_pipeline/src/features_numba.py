@@ -2,6 +2,7 @@ import numpy as np
 from numba import njit
 
 
+# Numba-accelerated feature kernels for production use
 @njit
 def rolling_mean_numba(values, user_ids, window):
     n = len(values)
