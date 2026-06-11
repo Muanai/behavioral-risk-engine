@@ -3,6 +3,8 @@ import numpy as np
 import time
 import os
 from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
+from sync_offline import push_to_offline_store
+from sync_online import push_to_online_store
 
 
 DATA_PATH = os.path.join("data", "processed", "transactions_processed.csv")
@@ -49,14 +51,16 @@ def main():
     try:
         df = load_data(DATA_PATH)
     except FileNotFoundError:
-        print(f"Error: File not found at {DATA_PATH}. Cek path file CSV lo.")
+        print(f"Error: File not found at {DATA_PATH}.")
         return
 
     required = ['user_id', 'month_idx', 'bill_amt', 'pay_amt']
     if not all(col in df.columns for col in required):
         print(f"Error: Dataset harus punya kolom: {required}")
-        print(f"Kolom yang ditemukan: {df.columns.tolist()}")
         return
+
+    max_month_per_user = df.groupby('user_id')['month_idx'].max().reset_index()
+    max_month_per_user.columns = ['user_id', 'timestamp']
 
     user_ids, late_mat, ratio_mat = prepare_numba_inputs_from_long_format(df)
 
@@ -77,6 +81,12 @@ def main():
     print(f"[4/4] Saving engineered features to {OUTPUT_PATH}...")
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     df_res.to_csv(OUTPUT_PATH, index=False)
+
+    df_sync = pd.merge(df_res, max_month_per_user, on='user_id', how='left')
+
+    print("[5/5] Synchronizing to Feature Store Layers...")
+    push_to_offline_store(df_sync)
+    push_to_online_store(df_sync, id_col="user_id", time_col="timestamp")
 
     print(f"\nMission Complete. Total runtime: {time.time() - start_global:.2f} seconds.")
 
