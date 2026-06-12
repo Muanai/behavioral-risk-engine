@@ -3,8 +3,8 @@ import numpy as np
 import time
 import os
 from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
-from sync_offline import push_to_offline_store
-from sync_online import push_to_online_store
+from feature_pipeline.src.sync_offline import push_to_offline_store
+from feature_pipeline.src.sync_online import push_to_online_store
 
 
 DATA_PATH = os.path.join("data", "processed", "transactions_processed.csv")
