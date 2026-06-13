@@ -1,3 +1,9 @@
+import os
+import sys
+
+# Add workspace root to sys.path so 'feature_pipeline' and 'model_training' can be imported
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from model_training.src.train_lr import train_logistic_regression

@@ -11,7 +11,7 @@ dependencies = [
     "redis>=5.0.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=7.0.0",
 ]

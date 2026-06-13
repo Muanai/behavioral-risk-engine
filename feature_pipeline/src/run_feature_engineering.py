@@ -2,6 +2,11 @@ import pandas as pd
 import numpy as np
 import time
 import os
+import sys
+
+# Add workspace root to sys.path so 'feature_pipeline' and 'model_training' can be imported
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
 from feature_pipeline.src.sync_offline import push_to_offline_store
 from feature_pipeline.src.sync_online import push_to_online_store
