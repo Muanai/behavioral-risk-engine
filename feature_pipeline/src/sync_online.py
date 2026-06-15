@@ -1,9 +1,15 @@
+import os
 import pandas as pd
 import redis
 
 
 def push_to_online_store(df: pd.DataFrame, id_col: str = "user_id", time_col: str = "timestamp"):
-    r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+    r = redis.Redis(
+        host=os.getenv("REDIS_HOST", "localhost"),
+        port=int(os.getenv("REDIS_PORT", "6379")),
+        db=0,
+        decode_responses=True
+    )
     latest_features = df.sort_values(time_col).groupby(id_col).tail(1)
 
     pipeline = r.pipeline()
