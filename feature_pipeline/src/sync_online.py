@@ -15,7 +15,7 @@ def push_to_online_store(df: pd.DataFrame, id_col: str = "user_id", time_col: st
     pipeline = r.pipeline()
 
     for _, row in latest_features.iterrows():
-        cid = str(row[id_col])
+        cid = str(int(row[id_col]))
         feature_dict = row.drop(labels=[id_col, time_col]).fillna(0).to_dict()
         feature_dict_str = {str(k): str(v) for k, v in feature_dict.items()}
         pipeline.hset(f"customer:{cid}", mapping=feature_dict_str)
