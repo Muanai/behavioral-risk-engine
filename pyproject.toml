@@ -3,7 +3,11 @@ name = "behavioral-risk-engine"
 version = "0.1.0"
 description = "End-to-end behavioral credit risk platform with Numba and FastAPI"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "feature-pipeline",
+    "model-training",
+    "inference-service",
+]
 
 [tool.uv.workspace]
 members = [
@@ -11,3 +15,8 @@ members = [
     "model_training",
     "inference_service"
 ]
+
+[tool.uv.sources]
+feature-pipeline = { workspace = true }
+model-training = { workspace = true }
+inference-service = { workspace = true }

@@ -64,6 +64,18 @@ wheels = [
 name = "behavioral-risk-engine"
 version = "0.1.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "feature-pipeline" },
+    { name = "inference-service" },
+    { name = "model-training" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "feature-pipeline", editable = "feature_pipeline" },
+    { name = "inference-service", editable = "inference_service" },
+    { name = "model-training", editable = "model_training" },
+]
 
 [[package]]
 name = "certifi"
@@ -126,7 +138,7 @@ wheels = [
 [[package]]
 name = "feature-pipeline"
 version = "0.1.0"
-source = { virtual = "feature_pipeline" }
+source = { editable = "feature_pipeline" }
 dependencies = [
     { name = "numba" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -277,7 +289,7 @@ wheels = [
 [[package]]
 name = "inference-service"
 version = "0.1.0"
-source = { virtual = "inference_service" }
+source = { editable = "inference_service" }
 dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
@@ -371,7 +383,7 @@ wheels = [
 [[package]]
 name = "model-training"
 version = "0.1.0"
-source = { virtual = "model_training" }
+source = { editable = "model_training" }
 dependencies = [
     { name = "joblib" },
     { name = "lightgbm" },
