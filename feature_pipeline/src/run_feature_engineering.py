@@ -7,36 +7,37 @@ import sys
 # Add workspace root to sys.path so 'feature_pipeline' and 'model_training' can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope
+from feature_pipeline.src.features_numba import get_max_consecutive_late, get_velocity_slope, get_critical_utilization
 from feature_pipeline.src.sync_offline import push_to_offline_store
 from feature_pipeline.src.sync_online import push_to_online_store
 
 
-DATA_PATH = os.path.join("data", "processed", "transactions_processed.csv")
-OUTPUT_PATH = os.path.join("data", "processed", "transactions_engineered.csv")
+OUTPUT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "processed", "transactions_engineered.csv"))
 
 
-def load_data(path):
-    print(f"[1/4] Loading data from {path}...")
-    df = pd.read_csv(path)
-    df.columns = [c.lower() for c in df.columns]
-    return df
+def load_and_prepare_matrices():
+    print("[1/4 & 2/4] Loading and Pivoting Data...")
+    RAW_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw", "default-of-credit-card-clients.xls"))
+    PROCESSED_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "processed", "transactions_processed.csv"))
 
+    raw_df = pd.read_excel(RAW_FILE, header=1)
+    raw_df.columns = [c.lower() for c in raw_df.columns]
+    raw_df.rename(columns={'id': 'user_id'}, inplace=True)
+    limit_map = raw_df.set_index('user_id')['limit_bal'].to_dict()
 
-def prepare_numba_inputs_from_long_format(df):
-    print("[2/4] Pivoting data to Matrix format...")
+    df_trans = pd.read_csv(PROCESSED_FILE)
 
-    df_pivot = df.pivot_table(
-        index='user_id',
-        columns='month_idx',
-        values=['bill_amt', 'pay_amt']
-    )
+    max_month_per_user = df_trans.groupby('user_id')['month_idx'].max().reset_index()
+    max_month_per_user.columns = ['user_id', 'timestamp']
 
-    df_pivot = df_pivot.fillna(0)
+    df_pivot_bill = df_trans.pivot(index='user_id', columns='month_idx', values='bill_amt').fillna(0)
+    df_pivot_pay = df_trans.pivot(index='user_id', columns='month_idx', values='pay_amt').fillna(0)
 
-    bill_matrix = df_pivot['bill_amt'].values
-    pay_matrix = df_pivot['pay_amt'].values
-    user_ids = df_pivot.index.values
+    users = df_pivot_bill.index.values
+    limit_bal_array = np.array([limit_map.get(u, 10000.0) for u in users], dtype=np.float64)
+
+    bill_matrix = df_pivot_bill.values
+    pay_matrix = df_pivot_pay.values
 
     is_late_matrix = np.zeros(bill_matrix.shape, dtype=np.int32)
     mask_late = (pay_matrix < (bill_matrix - 100)) & (bill_matrix > 0)
@@ -47,27 +48,17 @@ def prepare_numba_inputs_from_long_format(df):
         ratio_matrix = pay_matrix / (bill_matrix + epsilon)
     ratio_matrix_last_3 = ratio_matrix[:, -3:]
 
-    return user_ids, is_late_matrix, ratio_matrix_last_3
+    return users, is_late_matrix, ratio_matrix_last_3, bill_matrix, limit_bal_array, max_month_per_user
 
 
 def main():
     start_global = time.time()
 
     try:
-        df = load_data(DATA_PATH)
-    except FileNotFoundError:
-        print(f"Error: File not found at {DATA_PATH}.")
+        user_ids, late_mat, ratio_mat, bill_matrix, limit_bal_array, max_month_per_user = load_and_prepare_matrices()
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
         return
-
-    required = ['user_id', 'month_idx', 'bill_amt', 'pay_amt']
-    if not all(col in df.columns for col in required):
-        print(f"Error: Dataset harus punya kolom: {required}")
-        return
-
-    max_month_per_user = df.groupby('user_id')['month_idx'].max().reset_index()
-    max_month_per_user.columns = ['user_id', 'timestamp']
-
-    user_ids, late_mat, ratio_mat = prepare_numba_inputs_from_long_format(df)
 
     print(f"      Matrices prepared. Users: {len(user_ids)}")
 
@@ -81,7 +72,9 @@ def main():
     print("      -> Computing Payment Velocity...")
     df_res['feat_pay_velocity'] = get_velocity_slope(ratio_mat)
 
-    print("      -> Skipping Critical Utilization (LIMIT_BAL missing)")
+    print("      -> Computing Critical Utilization...")
+    critical_util_features = get_critical_utilization(bill_matrix, limit_bal_array)
+    df_res['critical_utilization_count'] = critical_util_features
 
     print(f"[4/4] Saving engineered features to {OUTPUT_PATH}...")
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
