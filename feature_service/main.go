@@ -16,14 +16,14 @@ var ctx = context.Background()
 var rdb *redis.Client
 
 func init() {
-	// Hanya naik satu tingkat ke root repositori
+	// Only go up one level to the repository root
 	err := godotenv.Load("../.env")
 	if err != nil {
-		log.Println("Peringatan: File .env tidak ditemukan, menggunakan fallback lokal.")
+		log.Println("Warning: .env file not found, using local fallback.")
 	}
 
 	redisHost := os.Getenv("REDIS_HOST")
-	// Paksa rute ke IPv4 jika sistem mengembalikan localhost kosong atau default
+	// Force IPv4 routing if system returns empty or default localhost
 	if redisHost == "" || redisHost == "localhost" {
 		redisHost = "127.0.0.1"
 	}
@@ -33,36 +33,36 @@ func init() {
 		redisPort = "6379"
 	}
 
-	// Membangun jembatan absolut ke kontainer Redis
+	// Establish an absolute connection to the Redis container
 	rdb = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", redisHost, redisPort),
 	})
 }
 
 func getFeatureHandler(w http.ResponseWriter, r *http.Request) {
-	// Menangkap parameter user_id dari URL
+	// Capture user_id parameter from URL
 	userID := r.URL.Query().Get("user_id")
 	if userID == "" {
-		http.Error(w, "user_id wajib diisi", http.StatusBadRequest)
+		http.Error(w, "user_id is required", http.StatusBadRequest)
 		return
 	}
 
-	// Kunci pencarian diubah sesuai format pipeline Python sebelumnya
+	// Search key changed to match previous Python pipeline format
 	redisKey := fmt.Sprintf("customer:%s", userID)
 
-	// Merampas seluruh nilai hash fitur dari Redis
+	// Retrieve all feature hash values from Redis
 	features, err := rdb.HGetAll(ctx, redisKey).Result()
 	if err != nil {
-		http.Error(w, "Gagal menembus Redis", http.StatusInternalServerError)
+		http.Error(w, "Failed to connect to Redis", http.StatusInternalServerError)
 		return
 	}
 
 	if len(features) == 0 {
-		http.Error(w, "Fitur behavioral tidak ditemukan untuk nasabah ini", http.StatusNotFound)
+		http.Error(w, "Behavioral features not found for this customer", http.StatusNotFound)
 		return
 	}
 
-	// Memuntahkan data dalam wujud JSON
+	// Output data in JSON format
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(features)
 }
@@ -71,6 +71,6 @@ func main() {
 	http.HandleFunc("/features", getFeatureHandler)
 
 	port := ":8080"
-	fmt.Printf("Feature Service API menyala dan mendengarkan di port %s...\n", port)
+	fmt.Printf("Feature Service API is running and listening on port %s...\n", port)
 	log.Fatal(http.ListenAndServe(port, nil))
 }
