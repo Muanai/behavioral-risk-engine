@@ -21,3 +21,8 @@ def push_to_online_store(df: pd.DataFrame, id_col: str = "user_id", time_col: st
         pipeline.hset(f"customer:{cid}", mapping=feature_dict_str)
 
     pipeline.execute()
+
+    try:
+        r.bgsave()
+    except redis.exceptions.ResponseError:
+        pass
