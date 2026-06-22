@@ -5,15 +5,15 @@ flowchart TD
     classDef model fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000;
     classDef audit fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000;
     classDef output fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000;
+    classDef infra fill:#e0f7fa,stroke:#006064,stroke-width:2px,color:#000;
 
     Raw[Raw Transactions CSV]:::data --> Pivot[Data Pivoting: User x Time]:::process
 
-    subgraph FeatureEng ["Feature Engineering Layer"]
+    subgraph FeatureEng ["Feature Engineering Engine"]
         direction TB
         Pivot --> SplitLogic{Feature Logic}
         
         SplitLogic -->|Aggregation| Baseline["Baseline Features<br/>(Mean/Max/Sum)"]:::process
-        
         SplitLogic -->|JIT Compilation| Numba[Numba Feature Engine]:::process
         
         Numba --> Feat1[Consecutive Late Streaks]
@@ -23,18 +23,31 @@ flowchart TD
         UnitTest["pytest: Unit Testing &<br/>Edge Case Validation"]:::audit -.->|Validates| Numba
     end
 
-    Feat1 & Feat2 & Feat3 & Baseline --> Merged[Engineered Feature Table]:::data
+    Feat1 & Feat2 & Feat3 & Baseline --> Merged[Engineered Feature Set]:::data
+
+    subgraph DualStore ["Dual-Store Infrastructure"]
+        direction LR
+        Merged -->|Batch Training Data| Offline[(PostgreSQL<br/>Offline Store)]:::infra
+        Merged -->|Pipeline Push + bgsave| Online[(Redis<br/>Online Store)]:::infra
+    end
 
     subgraph Modeling ["Modeling & Experimentation"]
-        Merged --> SplitData[Train / Test Split]
+        direction TB
+        Offline --> SplitData[Train / Test Split]
         SplitData --> Train[Model Training]:::model
         
         Train --> LR["Logistic Regression<br/>(Interpretability)"]:::model
-        Train --> LGBM["LightGBM<br/>(Non-Linear)"]:::model
+        Train --> LGBM["LightGBM 5-Fold CV<br/>(Non-Linear)"]:::model
+    end
+
+    subgraph Serving ["Real-Time Serving Layer"]
+        direction TB
+        Online --> GoAPI["Go Feature Service<br/>(Docker Alpine Container)"]:::infra
+        GoAPI -->|Load Tested: 617 RPS<br/>Latency < 2ms| Infer["Real-Time Inference<br/>Client (Python)"]:::output
     end
 
     subgraph Eval ["Evaluation & Audit"]
-        LR & LGBM --> Metrics["Performance Metrics<br/>(AUC / ROC)"]:::output
+        LR & LGBM --> Metrics["Performance Metrics<br/>(OOF ROC-AUC)"]:::output
         
         SplitData --> PSI["PSI Check<br/>(Population Stability Index)"]:::audit
         LGBM -.->|Probabilities| PSI
@@ -48,6 +61,7 @@ flowchart TD
         Scenarios --> S3[Scenario C: Hybrid Model]:::output
     end
 
-    S1 & S2 & S3 --> Uplift[Final Verdict & Uplift Analysis]:::output
+    S1 & S2 & S3 --> Uplift["Final Verdict:<br/>+7.3% AUC Uplift"]:::output
 
     linkStyle default stroke:#333,stroke-width:1px;
+```
