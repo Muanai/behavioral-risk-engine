@@ -1,1 +1,17 @@
+* text=auto
+
+*.sh text eol=lf
+*.py text eol=lf
+*.go text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+.env* text eol=lf
+
+*.csv binary
+*.xlsx binary
+*.xls binary
+*.pkl binary
+*.db binary
+*.rdb binary
+
 notebooks/* linguist-documentation
