@@ -1,4 +1,4 @@
-# Credit Risk Feature Engine (End-to-End Fintech Infrastructure)
+# Feature Flux (End-to-End Fintech Infrastructure)
 
 ![Go](https://img.shields.io/badge/Go-1.26-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -14,7 +14,7 @@
 
 ## Project Overview
 
-This project has evolved from a local Python experiment into a **Production-Grade Fintech Infrastructure**.
+Feature Flux has evolved from a local Python experiment into a **Production-Grade Fintech Infrastructure**.
 
 It is about **engineering complex, behavioral credit risk features** that:
 * are impossible or inefficient in pure SQL / Pandas
@@ -22,7 +22,7 @@ It is about **engineering complex, behavioral credit risk features** that:
 * justify low‑level optimization using **Numba**
 * are served instantly via a highly optimized **Go API** backed by **Redis**
 
-The project evaluates whether these features **meaningfully improve model performance** and proves that they can be served with **ultra-low latency** in a containerized microservices environment.
+The project evaluates whether capturing these dynamic behavioral shifts (**flux**) meaningfully improves model performance and proves they can be served with **ultra-low latency** in a containerized microservices environment.
 
 ---
 
