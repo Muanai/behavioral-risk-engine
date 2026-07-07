@@ -1,4 +1,7 @@
 # Feature Flux (End-to-End Fintech Infrastructure)
+<p align="center">
+  <img src="docs/images/architecture-overview.png" alt="System Architecture" width="100%">
+</p>
 
 ![Go](https://img.shields.io/badge/Go-1.26-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)
